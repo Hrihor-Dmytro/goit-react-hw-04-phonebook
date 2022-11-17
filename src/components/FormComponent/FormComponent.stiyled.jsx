@@ -1,6 +1,7 @@
 import styled from '@emotion/styled';
+import { Form, Field } from 'formik';
 
-export const SectionList = styled.form`
+export const FormWrapp = styled(Form)`
   margin-left: auto;
   margin-right: auto;
   text-align: center;
@@ -12,7 +13,7 @@ export const FormLabel = styled.label`
   margin-right: 10px;
 `;
 
-export const FormInput = styled.input`
+export const FormInput = styled(Field)`
   margin-left: 10px;
 `;
 

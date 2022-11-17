@@ -1,31 +1,22 @@
-import { Component } from 'react';
+import { useState, useEffect } from 'react';
 import { nanoid } from 'nanoid';
 import { Form } from './FormComponent/FormComponent';
 import { ContactList } from './ContactList/ContactsList';
 import { Filter } from './FiltrComponent/FiltrComponent';
 
-export class App extends Component {
-  state = {
-    contacts: [],
-    filter: '',
-  };
+export const App = () => {
+  const [contacts, setContacts] = useState(
+    JSON.parse(window.localStorage.getItem('contacts')) ?? []
+  );
+  const [filter, setFilter] = useState('');
 
-  componentDidUpdate(prevProps, prevState) {
-    if (this.state.contacts !== prevState.contacts) {
-      localStorage.setItem('contacts', JSON.stringify(this.state.contacts));
-    }
-  }
+  useEffect(() => {
+    window.localStorage.setItem('contacts', JSON.stringify(contacts));
+  }, [contacts]);
 
-  componentDidMount() {
-    const contacts = localStorage.getItem('contacts');
-    const parseContacts = JSON.parse(contacts);
+  const handleSubmit = (values, { resetForm }) => {
+    resetForm();
 
-    if (parseContacts) {
-      this.setState({ contacts: parseContacts });
-    }
-  }
-
-  handleSubmit = values => {
     const { name, number } = values;
 
     const contact = {
@@ -33,52 +24,37 @@ export class App extends Component {
       number,
     };
 
-    const dublicateContact = this.findDublicateContact(
-      contact,
-      this.state.contacts
-    );
+    const dublicateContact = findDublicateContact(contact, contacts);
 
     dublicateContact
       ? alert(`${contact.name} is already in contacts`)
-      : this.setState(prevState => ({
-          contacts: [...prevState.contacts, { ...values, id: nanoid() }],
-        }));
+      : setContacts([...contacts, { ...values, id: nanoid() }]);
   };
 
-  findDublicateContact = (contact, contactsList) => {
+  const requiredCard = () => {
+    const normalizedFilter = filter.toLowerCase();
+    return contacts.filter(contact =>
+      contact.name.toLowerCase().includes(normalizedFilter)
+    );
+  };
+
+  const findDublicateContact = (contact, contactsList) => {
     return contactsList.find(
       item => item.name.toLowerCase() === contact.name.toLowerCase()
     );
   };
-
-  deliteContact = contactId => {
-    this.setState(prevState => ({
-      contacts: prevState.contacts.filter(
-        contacts => contacts.id !== contactId
-      ),
-    }));
+  const onFilterChange = e => {
+    setFilter(e.currentTarget.value);
+    console.log(e);
   };
-
-  onFilterChange = e => {
-    this.setState({ filter: e.currentTarget.value });
+  const deleteCard = contactId => {
+    setContacts(contacts.filter(contact => contact.id !== contactId));
   };
-
-  render() {
-    const { filter } = this.state;
-    const normalizedFilter = this.state.filter.toLowerCase();
-    const visibleContacts = this.state.contacts.filter(contacts =>
-      contacts.name.toLowerCase().includes(normalizedFilter)
-    );
-    return (
-      <div>
-        <Form onSubmit={this.handleSubmit} />
-
-        <Filter value={filter} onFilterChange={this.onFilterChange} />
-        <ContactList
-          contactsArr={visibleContacts}
-          onDelitContact={this.deliteContact}
-        />
-      </div>
-    );
-  }
-}
+  return (
+    <div>
+      <Form onSubmit={handleSubmit} />
+      <Filter value={filter} onFilterChange={onFilterChange} />
+      <ContactList requiredCard={requiredCard()} deliteContact={deleteCard} />
+    </div>
+  );
+};

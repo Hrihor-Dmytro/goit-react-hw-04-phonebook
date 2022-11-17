@@ -3,6 +3,7 @@ import styled from '@emotion/styled';
 export const SectionList = styled.ul`
   display: flex;
   justify-content: center;
+  flex-direction: column;
   align-items: center;
   justify-content: left;
   margin: 0;

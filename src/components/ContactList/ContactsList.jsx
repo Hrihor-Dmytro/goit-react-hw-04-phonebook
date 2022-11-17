@@ -7,15 +7,15 @@ import {
   ContactButton,
 } from './ContactList.styled';
 
-export const ContactList = ({ contactsArr, onDelitContact }) => {
+export const ContactList = ({ requiredCard, deliteContact }) => {
   return (
     <SectionList>
-      {contactsArr.map(({ id, name, number }) => {
+      {requiredCard.map(({ id, name, number }) => {
         return (
           <SectionLi key={id}>
             <ContactTitle> {name} </ContactTitle>
             <ContactTel href="tel {number}">{number}</ContactTel>
-            <ContactButton type="button" onClick={() => onDelitContact(id)}>
+            <ContactButton type="button" onClick={() => deliteContact(id)}>
               Delite
             </ContactButton>
           </SectionLi>
